@@ -133,6 +133,15 @@ link:
   panel:    [2560, 1700]
   locales: [en, es-419, pt-BR, fr, es, it, de, nl, da, nb, sv, ko, ja, id, th]
 
+samus:
+  # Non-standard Graphics mode 1280x850, with 2560x1700 panel.
+  # Can boot recovery by USB and SD card readers.
+  # Note its firmware can not contain all default locales so the shipping locale
+  # list is specified.
+  res:      [1280, 850]
+  panel:    [2560, 1700]
+  locales:  [en, es-419, pt-BR, fr, es, it, de, nl, da, nb, sv, ko, ja, id, th]
+
 stumpy:
   # There's no standard panel size for Stumpy -- depends on the monitor user has
   # attached. Let's assume it's a modern LCD panel with 1920x1080 dimension.
