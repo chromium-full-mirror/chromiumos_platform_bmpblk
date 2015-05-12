@@ -64,7 +64,7 @@ spring:
   panel:     [1366, 768]
   sdcard:    False
 
-falco,peppy,wolf,leon,banjo:
+falco,peppy,wolf,leon,banjo,orco:
   # Using VESA graphics mode 1024x768 (0x0117), streched to 1366x768 panel.
   # With card reader. USB3 ports will run in USB2 mode for recovery boot.
   res:      [1024, 768]
@@ -82,7 +82,7 @@ auron_paine,auron_yuna,cid:
   res:      [1024, 768]
   panel:    [1366, 768]
 
-panther,tricky,mccloud,guado,tidus,rikku:
+panther,tricky,mccloud,guado,tidus,rikku,ninja:
   # Using VESA graphics mode 1024x768 (0x0117).
   # A chromebox without built-in panel/keyboard.
   # Assume the display is a modern 16:9 (1920x1080) monitor.
@@ -103,7 +103,7 @@ zako:
   optional_screens: [ReserveCharging, ReserveChargingEmpty, WrongPowerSupply]
   text_colors:  4
 
-monroe:
+monroe,sumo:
   # Using VESA graphics mode 1024x768 (0x0117).
   # A chromestation with built-in panel, without built-in keyboard.
   # Display is a modern 16:9 (1920x1080) monitor.
