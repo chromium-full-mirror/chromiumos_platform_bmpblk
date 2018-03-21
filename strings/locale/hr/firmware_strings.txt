@@ -20,3 +20,5 @@ Priključeni izvor napajanja nema dovoljno snage za napajanje ovog uređaja.
 OS Chrome sada će se isključiti.
 Priključite odgovarajući adapter i pokušajte ponovno.
 Uklonite sve povezane uređaje i pokrenite oporavak
+Chrome OS
+Alt OS

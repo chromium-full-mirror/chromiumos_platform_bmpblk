@@ -20,3 +20,5 @@ Priključeno napajanje je prešibko za to napravo.
 Sistem Chrome OS se bo zaustavil.
 Uporabite ustrezen napajalnik in poskusite znova.
 Odstranite vse povezane naprave in začnite obnovitev
+Chrome OS
+Alt OS

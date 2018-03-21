@@ -20,3 +20,5 @@ Das angeschlossene Netzteil reicht für die Stromversorgung dieses Geräts nicht
 Chrome OS wird jetzt heruntergefahren.
 Bitte versuchen Sie es mit dem richtigen Netzteil erneut.
 Bitte entfernen Sie alle verbundenen Geräte und beginnen Sie mit der Wiederherstellung.
+Chrome OS
+Alt OS

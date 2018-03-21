@@ -20,3 +20,5 @@ Strømforsyningen som er tilkoblet har ikke nok effekt til å drifte denne enhet
 Chrome OS avsluttes nå.
 Bruk riktig adapter og prøv på nytt.
 Fjern alle tilkoblede enheter og begynn gjenopprettingen
+Chrome OS
+Alt OS

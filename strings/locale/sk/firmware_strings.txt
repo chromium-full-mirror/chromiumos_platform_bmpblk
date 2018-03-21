@@ -20,3 +20,5 @@ Pripojený zdroj napájania pre toto zariadenie nemá dostatočný výkon.
 Systém OS Chrome sa teraz vypne.
 Použite správny adaptér a skúste to znova.
 Odstráňte všetky pripojené zariadenia a začnite obnovenie
+Chrome OS
+Alt OS

@@ -20,3 +20,5 @@ Penyedia daya yang terhubung tidak memiliki cukup daya untuk menjalankan perangk
 Chrome OS akan dimatikan sekarang.
 Gunakan adaptor yang sesuai dan coba lagi.
 Hapus semua perangkat yang tersambung dan mulai pemulihan
+Chrome OS
+Alt OS

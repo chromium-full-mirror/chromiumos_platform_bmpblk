@@ -20,3 +20,5 @@ L'alimentatore collegato non fornisce energia sufficiente per consentire il funz
 Chrome OS non verrà arrestato.
 Utilizza l'alimentatore adeguato e riprova.
 Rimuovi tutti i dispositivi collegati e avvia il ripristino
+Chrome OS
+Alt OS

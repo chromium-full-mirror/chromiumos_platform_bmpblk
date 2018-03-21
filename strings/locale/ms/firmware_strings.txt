@@ -20,3 +20,5 @@ Bekalan kuasa yang disambungkan tiada kuasa yang mencukupi untuk menjalankan per
 OS Chrome akan ditutup sekarang.
 Sila gunakan penyesuai yang betul dan cuba lagi.
 Sila alih keluar semua peranti yang disambungkan, kemudian mulakan pemulihan
+Chrome OS
+Alt OS

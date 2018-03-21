@@ -20,3 +20,5 @@ OS-i kinnitamise lülitamiseks asendisse VÄLJAS vajutage nuppu TAASTE.
 Chrome OS lülitub nüüd välja.
 Kasutage õiget adapterit ja proovige uuesti.
 Eemaldage kõik ühendatud seadmed ja alustage taastamist
+Chrome OS
+Alt OS

@@ -20,3 +20,5 @@ A fonte de alimentação ligada não tem energia suficiente para alimentar este 
 O SO Chrome será agora encerrado.
 Utilize o carregador correto e tente novamente.
 Remova todos os dispositivos ligados e inicie a recuperação
+Chrome OS
+Alt OS

@@ -20,3 +20,5 @@ La fuente de alimentación conectada no tiene suficiente energía para hacer fun
 El Sistema operativo Chrome se cerrará.
 Utiliza el adaptador correcto y vuelve a intentarlo.
 Quita todos los dispositivos conectados y comienza la recuperación
+Chrome OS
+Alt OS

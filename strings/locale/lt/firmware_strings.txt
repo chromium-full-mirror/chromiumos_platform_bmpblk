@@ -20,3 +20,5 @@ Prijungtas maitinimo šaltinis neteikia pakankamai energijos, kad šis įrenginy
 „Chrome“ OS dabar bus išjungta.
 Naudokite tinkamą adapterį ir bandykite dar kartą.
 Pašalinkite visus prijungtus įrenginius ir pradėkite atkūrimo procesą
+Chrome OS
+Alt OS
