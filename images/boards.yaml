@@ -304,8 +304,8 @@ octopus:
   hi_res:   [en]
 
 nocturne:
-  # 2400x1600, boots recovery image on USB ports.
-  screen:   [2400, 1600]
+  # 3000x2000, boots recovery image on USB ports.
+  screen:   [3000, 2000]
   hi_res:   [en]
   text_colors:  4
 
