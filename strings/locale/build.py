@@ -156,7 +156,9 @@ def ConvertPngFile(locale, file_name, styles, fonts, output_dir):
   command = [TXT_TO_PNG_SVG, "--lan=%s" % locale, "--outdir=%s" % output_dir]
   if file_name in styles:
     command.append(styles[file_name])
-  if locale in fonts:
+  # TODO(phoenixshen): This is a hack to use Roboto font on newly designed
+  # screens. Remove this after we change the default font to Roboto.
+  if locale in fonts and '--font' not in command[-1]:
     command.append("--font='%s'" % fonts[locale])
   font_size = os.getenv("FONTSIZE")
   if font_size is not None:
