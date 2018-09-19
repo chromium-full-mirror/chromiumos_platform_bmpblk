@@ -21,4 +21,5 @@ Chrome OS avsluttes nå.
 Bruk riktig adapter og prøv på nytt.
 Fjern alle tilkoblede enheter og begynn gjenopprettingen
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

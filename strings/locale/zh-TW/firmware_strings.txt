@@ -21,4 +21,5 @@ Chrome 作業系統將立即關閉。
 請使用正確的變壓器，然後再試一次。
 請移除所有外接裝置，然後開始進行修復程序
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

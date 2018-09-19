@@ -21,4 +21,5 @@ Chrome OS şimdi kapatılacak.
 Lütfen doğru adaptörü kullanın ve tekrar deneyin.
 Lütfen tüm bağlı cihazları çıkarın ve kurtarma işlemini başlatın
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

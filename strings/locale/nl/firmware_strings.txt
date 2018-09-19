@@ -21,4 +21,5 @@ Chrome OS wordt nu uitgeschakeld.
 Gebruik de juiste adapter en probeer het opnieuw.
 Verwijder alle gekoppelde apparaten en start het herstelproces
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

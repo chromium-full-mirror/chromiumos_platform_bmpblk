@@ -21,4 +21,5 @@ Chrome OS non verrà arrestato.
 Utilizza l'alimentatore adeguato e riprova.
 Rimuovi tutti i dispositivi collegati e avvia il ripristino
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

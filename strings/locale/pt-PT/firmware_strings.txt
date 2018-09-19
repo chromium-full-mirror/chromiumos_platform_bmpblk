@@ -21,4 +21,5 @@ O SO Chrome será agora encerrado.
 Utilize o carregador correto e tente novamente.
 Remova todos os dispositivos ligados e inicie a recuperação
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

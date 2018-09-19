@@ -21,4 +21,5 @@ Chrome-käyttöjärjestelmä sammutetaan.
 Yhdistä sopiva virtalähde ja yritä uudelleen.
 Irrota kaikki yhdistetyt laitteet ja aloita palauttaminen.
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

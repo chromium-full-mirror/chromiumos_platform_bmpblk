@@ -21,4 +21,5 @@ Magsa-shut down na ngayon ang Chrome OS.
 Pakigamit ang tamang adaptor at subukang muli.
 Pakialis ang lahat ng nakakonektang device at simulan ang pag-recover
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

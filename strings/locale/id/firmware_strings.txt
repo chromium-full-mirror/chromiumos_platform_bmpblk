@@ -21,4 +21,5 @@ Chrome OS akan dimatikan sekarang.
 Gunakan adaptor yang sesuai dan coba lagi.
 Hapus semua perangkat yang tersambung dan mulai pemulihan
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

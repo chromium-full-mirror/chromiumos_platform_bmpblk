@@ -21,4 +21,5 @@ Prijungtas maitinimo šaltinis neteikia pakankamai energijos, kad šis įrenginy
 Naudokite tinkamą adapterį ir bandykite dar kartą.
 Pašalinkite visus prijungtus įrenginius ir pradėkite atkūrimo procesą
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

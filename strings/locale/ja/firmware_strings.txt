@@ -21,4 +21,5 @@ Chrome OS をシャットダウンします。
 適切なアダプターを使用してもう一度お試しください。
 接続されている機器を全て取り外して、復元処理を開始してください。
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

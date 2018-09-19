@@ -21,4 +21,5 @@ Chrome OS sẽ tắt bây giờ.
 Hãy sử dụng bộ đổi nguồn đúng và thử lại.
 Vui lòng tháo tất cả các thiết bị đã kết nối và bắt đầu khôi phục
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

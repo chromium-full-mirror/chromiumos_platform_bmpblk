@@ -21,4 +21,5 @@ A Chrome OS kikapcsol.
 Kérjük, próbálja újra egy megfelelő tápegység használatával.
 Kérjük, távolítsa el az összes csatlakoztatott eszközt, és kezdje meg a helyreállítást
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

@@ -21,4 +21,5 @@ Chrome操作系统将立即关闭。
 请使用正确的电源适配器并重试。
 请先移除所有已连接的设备，然后开始恢复
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

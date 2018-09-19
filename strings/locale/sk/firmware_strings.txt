@@ -21,4 +21,5 @@ Systém OS Chrome sa teraz vypne.
 Použite správny adaptér a skúste to znova.
 Odstráňte všetky pripojené zariadenia a začnite obnovenie
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

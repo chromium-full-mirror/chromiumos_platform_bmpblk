@@ -21,4 +21,5 @@ Chrome OS se cerrará.
 Utiliza el adaptador correcto y vuelve a intentarlo.
 Retira todos los dispositivos conectados e inicia la recuperación
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

@@ -21,4 +21,5 @@ O Chrome OS será desligado agora.
 Use o adaptador correto e tente novamente.
 Remova todos os dispositivos conectados e inicie a recuperação
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

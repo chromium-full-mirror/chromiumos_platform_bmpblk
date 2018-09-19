@@ -21,4 +21,5 @@ Chrome OS wird jetzt heruntergefahren.
 Bitte versuchen Sie es mit dem richtigen Netzteil erneut.
 Bitte entfernen Sie alle verbundenen Geräte und beginnen Sie mit der Wiederherstellung.
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

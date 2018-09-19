@@ -35,7 +35,8 @@ inputs:
   - change_adapter #21 Please use the correct adapter and try again.
   - os_broken      #22 OS may be broken. Remove media and initiate recovery.
   - chrome_os      #23 Chrome OS
-  - alt_os         #24 Alt OS
+  - alt_os         #24 Dual Boot
+  - select_os      #23 Select an operating system.
 
 
 detachable_inputs:
@@ -79,6 +80,7 @@ files:
   os_broken:      [missing, os_broken]
   chrome_os:
   alt_os:
+  select_os:
 
 detachable_files:
   dev_option:     [dev_option]
@@ -107,6 +109,9 @@ styles:
   for_help_left:  '--color=444444'
   for_help_right: '--color=444444'
   model:          '--color=444444'
+  chrome_os:      '--color=202124 --font=Roboto --bgcolor=fafafc'
+  alt_os:         '--color=202124 --font=Roboto --bgcolor=fafafc'
+  select_os:      '--color=202124 --font=Roboto'
 
 detachable_styles:
   dev_option:     '--align=left'

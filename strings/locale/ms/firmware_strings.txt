@@ -21,4 +21,5 @@ OS Chrome akan ditutup sekarang.
 Sila gunakan penyesuai yang betul dan cuba lagi.
 Sila alih keluar semua peranti yang disambungkan, kemudian mulakan pemulihan
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

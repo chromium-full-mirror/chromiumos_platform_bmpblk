@@ -21,4 +21,5 @@ Chrome OS will now shut down.
 Please use the correct adapter and try again.
 Please remove all connected devices and start recovery
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

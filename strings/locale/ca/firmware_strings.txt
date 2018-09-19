@@ -21,4 +21,5 @@ Chrome OS s'apagarà d'aquí a uns instants.
 Utilitzeu l'adaptador correcte i torneu-ho a provar.
 Traieu tots els dispositius connectats i inicieu la recuperació
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

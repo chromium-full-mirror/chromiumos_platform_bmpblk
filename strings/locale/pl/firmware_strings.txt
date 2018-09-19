@@ -21,4 +21,5 @@ Chrome OS zostanie teraz zamknięty.
 Użyj odpowiedniego zasilacza i spróbuj ponownie.
 Odłącz wszystkie podłączone urządzenia i rozpocznij odzyskiwanie
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

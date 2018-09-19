@@ -21,4 +21,5 @@
 השתמש במתאם המתאים ונסה שוב.
 הסר את כל ההתקנים המחוברים והתחל בשחזור
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system

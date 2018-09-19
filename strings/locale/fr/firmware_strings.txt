@@ -21,4 +21,5 @@ Chrome OS va se fermer.
 Veuillez utiliser le bon adaptateur, puis réessayer.
 Veuillez débrancher tous les appareils connectés et lancer la récupération.
 Chrome OS
-Alt OS
+Dual Boot
+Select an operating system
