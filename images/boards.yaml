@@ -306,8 +306,8 @@ octopus:
 nocturne:
   # 3000x2000, boots recovery image on USB ports.
   screen:   [3000, 2000]
+  sdcard:   False
   hi_res:   [en]
-  text_colors:  4
 
 rammus:
   # 1920x1080, boots recovery image on USB ports.
