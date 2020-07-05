@@ -295,6 +295,9 @@ Make sure your external disk has a valid Chrome OS image, and re-insert the disk
       <message name="dev_select_bootloader_title" desc="Title for screen to select alternate bootloader.">
 Select alternate bootloader
       </message>
+      <message name="btn_launch_diag" desc="String for the button to enter diagnostics.">
+Launch diagnostics
+      </message>
       <message name="btn_next" desc="String for the next button.">
 Next
       </message>
