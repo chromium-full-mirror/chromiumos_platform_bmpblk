@@ -71,6 +71,7 @@ inputs:
   - btn_secure_mode
   - btn_int_disk
   - btn_ext_disk
+  - btn_alt_bootloader
   # to-norm screen
   - dev_to_norm_title
   - dev_to_norm_desc0
@@ -80,6 +81,8 @@ inputs:
   - dev_boot_ext_desc0
   - dev_invalid_disk_title
   - dev_invalid_disk_desc0
+  # developer: select bootloader
+  - dev_select_bootloader_title
   # generic buttons
   - btn_next
   - btn_back
@@ -174,6 +177,8 @@ files:
   btn_int_disk_focus: [btn_int_disk]
   btn_ext_disk:
   btn_ext_disk_focus: [btn_ext_disk]
+  btn_alt_bootloader:
+  btn_alt_bootloader_focus: [btn_alt_bootloader]
   # to-norm screen
   dev_to_norm_title:
   dev_to_norm_desc0:
@@ -183,6 +188,8 @@ files:
   dev_boot_ext_desc0:
   dev_invalid_disk_title:
   dev_invalid_disk_desc0:
+  # developer: select bootloader
+  dev_select_bootloader_title:
   # generic buttons
   btn_next:
   btn_next_focus: [btn_next]
@@ -293,6 +300,8 @@ styles:
   btn_int_disk_focus: *button_focused_color
   btn_ext_disk: *button_color
   btn_ext_disk_focus: *button_focused_color
+  btn_alt_bootloader: *button_color
+  btn_alt_bootloader_focus: *button_focused_color
   # to-norm screen
   dev_to_norm_title: *base_color
   dev_to_norm_desc0: *base_color
@@ -302,6 +311,8 @@ styles:
   dev_boot_ext_desc0: *base_color
   dev_invalid_disk_title: *base_color
   dev_invalid_disk_desc0: *base_color
+  # developer: select bootloader
+  dev_select_bootloader_title: *base_color
   # generic buttons
   btn_next: *button_color
   btn_next_focus: *button_focused_color

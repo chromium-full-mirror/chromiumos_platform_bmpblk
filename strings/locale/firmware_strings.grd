@@ -268,6 +268,9 @@ Boot from internal disk
       <message name="btn_ext_disk" desc="Button for booting into the external disk.">
 Boot from external disk
       </message>
+      <message name="btn_alt_bootloader" desc="Button for selecting an alternate bootloader.">
+Select alternate bootloader
+      </message>
       <message name="dev_to_norm_title" desc="Title for screen for transition from developer to normal mode.">
 Confirm returning to secure mode
       </message>
@@ -288,6 +291,9 @@ No valid image detected
       </message>
       <message name="dev_invalid_disk_desc0" desc="String1 for screen that appears when user plugs in a USB/SD card with an invalid image on it.">
 Make sure your external disk has a valid Chrome OS image, and re-insert the disk when ready.
+      </message>
+      <message name="dev_select_bootloader_title" desc="Title for screen to select alternate bootloader.">
+Select alternate bootloader
       </message>
       <message name="btn_next" desc="String for the next button.">
 Next
