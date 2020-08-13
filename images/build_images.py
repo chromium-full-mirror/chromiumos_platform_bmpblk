@@ -453,7 +453,7 @@ class Converter(object):
 
       # Determine num_lines in order to scale the image
       # TODO(b/159399377): Wrap lines for texts other than descriptions.
-      if one_line_dir and scale and '_desc' in name:
+      if one_line_dir and '_desc' in name:
         num_lines = self.get_num_lines(file, one_line_dir)
       else:
         num_lines = 1
