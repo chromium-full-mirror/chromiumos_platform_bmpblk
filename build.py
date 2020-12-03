@@ -212,12 +212,17 @@ def parse_locale_input_files(locale, json_dir):
     A dictionary for mapping of "name to content" for files to be generated.
   """
   result = parse_locale_json_file(locale, json_dir)
+  name_map = {
+    'language': ('lang_header', 'lang_menu', 'lang_menu_focus'),
+  }
 
   # Walk locale directory to add pre-generated texts such as language names.
   for input_file in glob.glob(os.path.join(LOCALE_DIR, locale, "*.txt")):
     name, _ = os.path.splitext(os.path.basename(input_file))
     with open(input_file, 'r', encoding='utf-8-sig') as f:
-      result[name] = f.read().strip()
+      content = f.read().strip()
+    for new_name in name_map.get(name, (name,)):
+      result[new_name] = content
 
   return result
 
@@ -793,11 +798,16 @@ class Converter(object):
     for locale_info in self.locales:
       locale = locale_info.code
       ro_locale_dir = os.path.join(self.output_ro_dir, locale)
-      old_file = os.path.join(ro_locale_dir, 'language.bmp')
-      new_file = os.path.join(self.output_dir, 'language_%s.bmp' % locale)
-      if os.path.exists(new_file):
-        raise BuildImageError('File already exists: %s' % new_file)
-      shutil.move(old_file, new_file)
+      for old_name, new_name in [
+          ('lang_header', 'lang_header_%s' % locale),
+          ('lang_menu', 'lang_menu_%s' % locale),
+          ('lang_menu_focus', 'lang_menu_%s_focus' % locale),
+      ]:
+        old_file = os.path.join(ro_locale_dir, old_name + '.bmp')
+        new_file = os.path.join(self.output_dir, new_name + '.bmp')
+        if os.path.exists(new_file):
+          raise BuildImageError('File already exists: ' % new_file)
+        shutil.move(old_file, new_file)
 
   def convert_fonts(self):
     """Converts font images"""

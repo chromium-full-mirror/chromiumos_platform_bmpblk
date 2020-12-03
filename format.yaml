@@ -21,7 +21,9 @@ generic_files: {}
 # Key is the name in firmware_strings.grd; value is the category of the string.
 localized_files:
   # pre-generated
-  language: language
+  lang_header: lang_header
+  lang_menu: lang_menu
+  lang_menu_focus: lang_menu_focus
   # firmware sync
   firmware_sync_title: title
   firmware_sync_desc: desc
@@ -149,7 +151,17 @@ styles:
     height: 24
     # Maximum width of the bitmap for wrapping lines.
     max_width: null
-  language:
+  lang_header:
+    bgcolor: '#161719'
+    fgcolor: '#cccccc'
+    height: 24
+  lang_menu:
+    bgcolor: '#2d2e30'
+    fgcolor: '#cccccc'
+    height: 26
+  lang_menu_focus:
+    bgcolor: '#8ab4f8'
+    fgcolor: '#2d2e30'
     height: 26
   title:
     bgcolor: *grey_900
