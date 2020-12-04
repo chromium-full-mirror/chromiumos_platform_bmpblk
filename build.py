@@ -856,9 +856,6 @@ class Converter(object):
     print('Converting asset images...')
     self.convert_assets()
 
-    print('Converting generic strings...')
-    self.convert_generic_strings()
-
     print('Converting localized strings...')
     self.convert_localized_strings()
 
