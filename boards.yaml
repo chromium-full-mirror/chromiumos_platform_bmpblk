@@ -251,6 +251,7 @@ dedede:
   # 2400x1600, boots recovery image on USB ports.
   screen:   [1280, 720]  # Flash size limited - resized from native resolution.
   text_colors: 5  # Flash size limited - CHECK YOUR BOARD BEFORE COPY-PASTING.
+  rw_override: [diag_menu_desc0]
 
 jacuzzi:
   # 1366x768, boots recovery image on USB ports or SD card.
