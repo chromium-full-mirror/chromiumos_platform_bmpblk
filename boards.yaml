@@ -262,6 +262,7 @@ trogdor:
   # 1920x1080, boots recovery image on any SD card or USB ports.
   screen:   [1366, 768]  # Flash size limited - CHECK BEFORE COPY-PASTING.
   text_colors: 6
+  rw_override: [diag_menu_desc0]
 
 strongbad:
   # 1920x1080, boots recovery image on any SD card or USB ports.
