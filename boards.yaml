@@ -247,7 +247,7 @@ zork:
   screen:   [1920, 1080]  # Use native resolution - CHECK BEFORE COPY-PASTING.
   text_colors: 7  # Flash size limited - CHECK YOUR BOARD BEFORE COPY-PASTING.
 
-dedede,shotzo:
+dedede,shotzo,dibbi:
   # 2400x1600, boots recovery image on USB ports.
   screen:   [1280, 720]  # Flash size limited - resized from native resolution.
   text_colors: 5  # Flash size limited - CHECK YOUR BOARD BEFORE COPY-PASTING.
