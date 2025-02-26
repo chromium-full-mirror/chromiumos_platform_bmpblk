@@ -13,12 +13,15 @@ from concurrent.futures import ProcessPoolExecutor
 import copy
 import glob
 import json
+from multiprocessing import Manager
 import os
+from pathlib import Path
 import re
 import shutil
 import subprocess
 import sys
 
+from fontTools.ttLib import TTCollection
 from PIL import Image
 import yaml
 
@@ -39,6 +42,7 @@ PNG_FILES = '*.png'
 # String format YAML key names.
 KEY_DEFAULT = '_DEFAULT_'
 KEY_GLYPH = '_GLYPH_'
+KEY_TITLE = 'title'
 KEY_LOCALES = 'locales'
 KEY_GENERIC_FILES = 'generic_files'
 KEY_LOCALIZED_FILES = 'localized_files'
@@ -49,11 +53,13 @@ KEY_FGCOLOR = 'fgcolor'
 KEY_HEIGHT = 'height'
 KEY_MAX_WIDTH = 'max_width'
 KEY_FONTS = 'fonts'
+KEY_CHAR_FONTS = 'char_fonts'
 KEY_RW_ONLY = 'rw_only'
 
 # Board config YAML key names.
 KEY_SDCARD = 'sdcard'
 KEY_DPI = 'dpi'
+KEY_BPP = 'bpp'
 KEY_RTL = 'rtl'
 KEY_RW_OVERRIDE = 'rw_override'
 KEY_SPLIT_RATIO = 'split_ratio'
@@ -66,8 +72,12 @@ NEWLINE_PATTERN = re.compile(r'([^\n])\n([^\n])')
 NEWLINE_REPLACEMENT = r'\1 \2'
 CRLF_PATTERN = re.compile(r'\r\n')
 MULTIBLANK_PATTERN = re.compile(r'   *')
+FONT_FILENAME_SUB_PATTERN = re.compile('[- ]')
 
-LocaleInfo = namedtuple('LocaleInfo', ['code', 'rtl'])
+LocaleInfo = namedtuple('LocaleInfo', ['code', 'rtl', 'font'])
+
+TTF_TABLE_ID_FULL_NAME = 4
+VALID_BPP_VALUES = (1, 2, 4, 8)
 
 
 class BuildImageError(Exception):
@@ -116,13 +126,24 @@ def load_board_config(filename, board):
     return config
 
 
-def check_fonts(fonts):
-    """Checks if all fonts are available."""
-    for locale, font in fonts.items():
+def check_fonts(fonts, key_descr):
+    """Checks if fonts in given dict are available.
+
+    Args:
+        fonts: A dictionary with font names as the values.
+        key_descr: A string description of key of 'fonts'.
+    """
+    for key, font in fonts.items():
         if subprocess.run(['fc-list', '-q', font], check=False).returncode != 0:
             raise BuildImageError(
-                f'Font {font!r} not found for locale {locale!r}'
+                f'Font {font!r} not found for {key_descr} {key!r}'
             )
+
+
+def check_all_fonts(formats):
+    """Checks if all fonts specified in given config are available."""
+    check_fonts(formats[KEY_FONTS], 'locale')
+    check_fonts(formats[KEY_CHAR_FONTS], 'character')
 
 
 def run_pango_view(
@@ -164,6 +185,73 @@ def run_pango_view(
     subprocess.check_call(command, stdout=subprocess.PIPE)
 
 
+def run_lv_font_conv(
+    locale_fonts, shared_fonts, filename_to_font, font_size, bpp, output_dir
+):
+    """Runs lv_conv_font.
+
+    Create a LVGL font file for each key in 'locale_fonts'.
+
+    Args:
+        locale_fonts: A dictionary that maps font files to localized characters.
+            Each key in this dictionary has an associated LVGL output.
+        shared_fonts: A dictionary that maps font files to shared characters.
+            All outputs will contain every character in this dictionary.
+        filename_to_font: A dictionary that maps font files to font names.
+        font_size: An integer size of font in pixels.
+        bpp: Bits per pixel. Must be one of the following integers: 1, 2, 4, 8.
+        output_dir: Directory to save the output font files.
+    """
+    if bpp not in VALID_BPP_VALUES:
+        raise BuildImageError(
+            f'Invalid bpp of {bpp} should be one of: {VALID_BPP_VALUES}'
+        )
+
+    command_prefix = [
+        'lv_font_conv',
+        '--no-compress',
+        '--no-prefilter',
+        '--force-fast-kern-format',
+        '--format',
+        'bin',
+        '--size',
+        str(font_size),
+        '--bpp',
+        str(bpp),
+    ]
+
+    # Add icon to all font files.
+    for font_path, chars in shared_fonts.items():
+        chars_range = ','.join(
+            set(map(lambda x: format(ord(x), '#06x'), chars))
+        )
+        command_prefix += [
+            '--font',
+            font_path,
+            '--r',
+            chars_range,
+        ]
+
+    # Create font file for each fonts.
+    for font_path, chars in locale_fonts.items():
+        # Use font name as output filename to be consistent with locales list
+        font_name = normalize_font_name(filename_to_font[font_path])
+        output_file = os.path.join(output_dir, f'font_{font_name}.bin')
+
+        chars_range = ','.join(
+            set(map(lambda x: format(ord(x), '#06x'), chars))
+        )
+        command = command_prefix + [
+            '--font',
+            font_path,
+            '--r',
+            chars_range,
+            '-o',
+            output_file,
+        ]
+        subprocess.check_call(command, stdout=subprocess.PIPE)
+
+
 def parse_locale_json_file(locale, json_dir):
     """Parses given firmware string json file.
 
@@ -187,6 +275,18 @@ def parse_locale_json_file(locale, json_dir):
             msgtext = msgtext.strip()
             result[tag] = msgtext
     return result
+
+
+def normalize_font_name(font):
+    """Normalizes font name to be lowercase and use underscores.
+
+    Args:
+        font: String font name to format.
+
+    Returns:
+        Reformatted string font name.
+    """
+    return re.sub(FONT_FILENAME_SUB_PATTERN, '_', font).lower()
 
 
 class Converter:
@@ -219,22 +319,32 @@ class Converter:
     SPRITE_MAX_COLORS = 128
     GLYPH_MAX_COLORS = 7
 
-    def __init__(self, board, formats, board_config, output):
+    def __init__(self, board, lvgl_font, formats, board_config, output):
         """Inits converter.
 
         Args:
             board: Board name.
+            lvgl_font: If true, generate LVGL fonts. Otherwise, create bitmaps.
             formats: A dictionary of string formats.
             board_config: A dictionary of board configurations.
             output: Output directory.
         """
         self.board = board
+        self.lvgl_font = lvgl_font
         self.formats = formats
         self.config = board_config
         self.set_dirs(output)
         self.set_rename_map()
         self.set_locales()
         self.text_max_colors = self.get_text_colors(self.config[KEY_DPI])
+        if self.lvgl_font:
+            manager = Manager()
+            self.locale_fonts = manager.dict()
+            self.shared_fonts = manager.dict()
+            self.locale_fonts_lock = manager.Lock()
+            self.shared_fonts_lock = manager.Lock()
+            self.font_to_filename = {}
+            self.filename_to_font = {}
 
     def set_dirs(self, output):
         """Sets board output directory and stage directory.
@@ -249,11 +359,13 @@ class Converter:
         self.output_ro_dir = os.path.join(self.output_dir, 'locale', 'ro')
         self.output_rw_dir = os.path.join(self.output_dir, 'locale', 'rw')
         self.output_generic_dir = os.path.join(self.output_dir, 'generic')
+        self.output_lvgl_fonts_dir = os.path.join(self.output_dir, 'lvgl_fonts')
         self.stage_dir = os.path.join(output, '.stage')
         self.stage_grit_dir = os.path.join(self.stage_dir, 'grit')
         self.stage_locale_dir = os.path.join(self.stage_dir, 'locale')
         self.stage_glyph_dir = os.path.join(self.stage_dir, 'glyph')
         self.stage_sprite_dir = os.path.join(self.stage_dir, 'sprite')
+        self.stage_ttf_dir = os.path.join(self.stage_dir, 'ttf')
 
     def set_rename_map(self):
         """Initializes a dict `self.rename_map` for image renaming.
@@ -354,6 +466,7 @@ class Converter:
         # LOCALES environment variable can override boards.yaml
         env_locales = os.getenv('LOCALES')
         rtl_locales = set(self.config[KEY_RTL])
+        fonts = self.formats[KEY_FONTS]
         if env_locales:
             locales = env_locales.split()
         else:
@@ -365,7 +478,12 @@ class Converter:
                     f'Unknown locales {list(unknown_rtl_locales)} in {KEY_RTL}'
                 )
         self.locales = [
-            LocaleInfo(code, code in rtl_locales) for code in locales
+            LocaleInfo(
+                code,
+                code in rtl_locales,
+                normalize_font_name(fonts.get(code, fonts[KEY_DEFAULT])),
+            )
+            for code in locales
         ]
 
     @classmethod
@@ -642,6 +760,77 @@ class Converter:
         )
         return width_pt
 
+    def get_ttf_path(self, font):
+        """Locates filepath of the specified font.
+
+        Args:
+            font: Font name.
+
+        Returns:
+            A String filepath of the font location.
+        """
+
+        output = subprocess.check_output(['fc-list', font], encoding='utf-8')
+        for line in output.splitlines():
+            abs_file, _, style = line.split(':')
+            if style == 'style=Regular':
+                break
+
+        abs_file = Path(abs_file)
+        if abs_file.suffix == '.ttf':
+            return abs_file
+        if abs_file.suffix != '.ttc':
+            raise BuildImageError(f'Invalid font extension {abs_file.suffix}')
+
+        ttc = TTCollection(abs_file)
+        for ttf in ttc:
+            font_name = ttf['name'].getDebugName(TTF_TABLE_ID_FULL_NAME)
+            if font_name == font:
+                ttf_font = ttf
+                break
+        filename = normalize_font_name(font_name)
+        filepath = os.path.join(self.stage_ttf_dir, f'{filename}.ttf')
+        if os.path.exists(filepath):
+            raise BuildImageError(f'TTF file already exists: {filepath}')
+        ttf_font.save(filepath)
+        return filepath
+
+    def init_font_maps(self):
+        """Creates dict to map font name to TTF filename and vice versa."""
+        os.makedirs(self.stage_ttf_dir, exist_ok=True)
+        font_set = set()
+        font_set |= set(self.formats[KEY_FONTS].values())
+        font_set |= set(self.formats[KEY_CHAR_FONTS].values())
+
+        for font in font_set:
+            if font not in self.font_to_filename:
+                filename = self.get_ttf_path(font)
+                self.font_to_filename[font] = filename
+                self.filename_to_font[filename] = font
+
+    def add_chars_to_font_map(self, font, new_chars, is_locale):
+        """Adds new characters to relevant font to character map.
+
+        Args:
+            font: String font name that is the entry of map to be updated.
+            new_chars: Set of characters to added to the font to characters map.
+                This set may contain characters already included in the map.
+            is_locale: Boolean to determine which font to character map to
+                update. If True, adds characters to self.locale_fonts.
+                Otherwise, adds characters to self.shared_fonts.
+        """
+        font_map = self.locale_fonts
+        lock = self.locale_fonts_lock
+        if not is_locale:
+            font_map = self.shared_fonts
+            lock = self.shared_fonts_lock
+
+        font_file = self.font_to_filename[font]
+        with lock:
+            chars = font_map.get(font_file, set())
+            chars |= new_chars
+            font_map[font_file] = chars
+
     def convert_sprite_images(self):
         """Converts sprite images."""
         names = self.formats[KEY_SPRITE_FILES]
@@ -690,7 +879,6 @@ class Converter:
             new_name = self.rename_map.get(name, name)
             if not new_name:
                 continue
-            bmp_file = os.path.join(self.output_generic_dir, new_name + '.bmp')
             category = names[name]
             style = get_config_with_defaults(styles, category)
             if style[KEY_MAX_WIDTH]:
@@ -701,20 +889,41 @@ class Converter:
                     f'{name}: {KEY_MAX_WIDTH!r} should be '
                     'null for generic strings'
                 )
-            self.convert_text_to_image(
-                None,
-                txt_file,
-                bmp_file,
-                default_font,
-                self.stage_dir,
-                self.text_max_colors,
-                height=style[KEY_HEIGHT],
-                max_width=None,
-                initial_width_pt=None,
-                dpi=dpi,
-                bgcolor=style[KEY_BGCOLOR],
-                fgcolor=style[KEY_FGCOLOR],
-            )
+
+            if self.lvgl_font:
+                output_file = os.path.join(
+                    self.output_generic_dir, new_name + '.txt'
+                )
+                # Add generic strings to localized default font
+                self.init_font_maps()
+                with open(txt_file, 'r', encoding='utf-8-sig') as f:
+                    # Strip any trailing whitespace. Newline characters are not
+                    # included in the primary .ttf files.
+                    content = f.read().strip()
+                self.add_chars_to_font_map(default_font, set(content), False)
+
+                # Save strings as text files
+                with open(output_file, 'w', encoding='utf-8-sig') as f:
+                    f.write(content)
+                    f.write('\0')
+            else:
+                output_file = os.path.join(
+                    self.output_generic_dir, new_name + '.bmp'
+                )
+                self.convert_text_to_image(
+                    None,
+                    txt_file,
+                    output_file,
+                    default_font,
+                    self.stage_dir,
+                    self.text_max_colors,
+                    height=style[KEY_HEIGHT],
+                    max_width=None,
+                    initial_width_pt=None,
+                    dpi=dpi,
+                    bgcolor=style[KEY_BGCOLOR],
+                    fgcolor=style[KEY_FGCOLOR],
+                )
 
     def build_locale(self, locale, names):
         """Builds images of strings for `locale`."""
@@ -730,6 +939,10 @@ class Converter:
         ):
             name, _ = os.path.splitext(os.path.basename(txt_file))
             with open(txt_file, 'r', encoding='utf-8-sig') as f:
+                # Strip any trailing whitespace. This is required for LVGL
+                # fonts since newline characters are not included in the primary
+                # .ttf files. For bitmaps, a trailing newline causes Pango to
+                # report a larger layout size than what's actually visible.
                 inputs[name] = f.read().strip()
 
         stage_dir = os.path.join(self.stage_locale_dir, locale)
@@ -748,44 +961,66 @@ class Converter:
             new_name = self.rename_map.get(name, name)
             if not new_name:
                 continue
-            output_file = os.path.join(output_dir, new_name + '.bmp')
 
-            # Write to text file
-            text_file = os.path.join(stage_dir, name + '.txt')
-            with open(text_file, 'w', encoding='utf-8-sig') as f:
-                f.write(inputs[name] + '\n')
+            if self.lvgl_font:
+                output_file = os.path.join(output_dir, new_name + '.txt')
 
-            # Convert text to image
-            style = get_config_with_defaults(styles, category)
-            height = style[KEY_HEIGHT]
-            max_width = style[KEY_MAX_WIDTH]
-            width_pt_counter = (
-                width_pt_counters[(height, max_width)] if max_width else None
-            )
-            if width_pt_counter:
-                # Similarly, find the most frequently used `width_pt`. In case
-                # of a tie, pick the largest width.
-                best_width_pt = max(
-                    width_pt_counter, key=lambda w: (width_pt_counter[w], w)
+                # Add all characters to font maps
+                new_chars = set(inputs[name])
+                override_chars = self.formats[KEY_CHAR_FONTS].keys()
+                self.add_chars_to_font_map(
+                    font, new_chars - override_chars, True
                 )
+
+                for char in override_chars & new_chars:
+                    override_font = self.formats[KEY_CHAR_FONTS][char]
+                    self.add_chars_to_font_map(override_font, set(char), False)
+
+                # Save strings as text files
+                with open(output_file, 'w', encoding='utf-8-sig') as f:
+                    f.write(inputs[name])
+                    f.write('\0')
             else:
-                best_width_pt = None
-            width_pt = self.convert_text_to_image(
-                locale,
-                text_file,
-                output_file,
-                font,
-                stage_dir,
-                self.text_max_colors,
-                height=height,
-                max_width=max_width,
-                initial_width_pt=best_width_pt,
-                dpi=dpi,
-                bgcolor=style[KEY_BGCOLOR],
-                fgcolor=style[KEY_FGCOLOR],
-            )
-            if width_pt:
-                width_pt_counter[width_pt] += 1
+                output_file = os.path.join(output_dir, new_name + '.bmp')
+
+                # Write to text file
+                text_file = os.path.join(stage_dir, name + '.txt')
+                with open(text_file, 'w', encoding='utf-8-sig') as f:
+                    f.write(inputs[name] + '\n')
+
+                # Convert text to image
+                style = get_config_with_defaults(styles, category)
+                height = style[KEY_HEIGHT]
+                max_width = style[KEY_MAX_WIDTH]
+                width_pt_counter = (
+                    width_pt_counters[(height, max_width)]
+                    if max_width
+                    else None
+                )
+                if width_pt_counter:
+                    # Similarly, find the most frequently used `width_pt`.
+                    # In case of a tie, pick the largest width.
+                    best_width_pt = max(
+                        width_pt_counter, key=lambda w: (width_pt_counter[w], w)
+                    )
+                else:
+                    best_width_pt = None
+                width_pt = self.convert_text_to_image(
+                    locale,
+                    text_file,
+                    output_file,
+                    font,
+                    stage_dir,
+                    self.text_max_colors,
+                    height=height,
+                    max_width=max_width,
+                    initial_width_pt=best_width_pt,
+                    dpi=dpi,
+                    bgcolor=style[KEY_BGCOLOR],
+                    fgcolor=style[KEY_FGCOLOR],
+                )
+                if width_pt:
+                    width_pt_counter[width_pt] += 1
 
     def build_localized_strings(self):
         """Builds images of localized strings."""
@@ -814,6 +1049,8 @@ class Converter:
             ]
         )
 
+        if self.lvgl_font:
+            self.init_font_maps()
         names = self.formats[KEY_LOCALIZED_FILES]
 
         with ProcessPoolExecutor() as executor:
@@ -844,9 +1081,10 @@ class Converter:
         for locale_info in self.locales:
             locale = locale_info.code
             ro_locale_dir = os.path.join(self.output_ro_dir, locale)
-            old_file = os.path.join(ro_locale_dir, 'language.bmp')
+            ext = 'txt' if self.lvgl_font else 'bmp'
+            old_file = os.path.join(ro_locale_dir, f'language.{ext}')
             new_file = os.path.join(
-                self.output_generic_dir, f'language_{locale}.bmp'
+                self.output_generic_dir, f'language_{locale}.{ext}'
             )
             if os.path.exists(new_file):
                 raise BuildImageError(f'File already exists: {new_file}')
@@ -854,16 +1092,24 @@ class Converter:
 
     def build_glyphs(self):
         """Builds glyphs of ascii characters."""
-        os.makedirs(self.stage_glyph_dir, exist_ok=True)
-        output_dir = os.path.join(self.output_dir, 'glyph')
-        os.makedirs(output_dir)
         styles = self.formats[KEY_STYLES]
         style = get_config_with_defaults(styles, KEY_GLYPH)
         height = style[KEY_HEIGHT]
         font = self.formats[KEY_FONTS][KEY_GLYPH]
+
+        ascii_range = range(ord(' '), ord('~') + 1)
+        if self.lvgl_font:
+            self.add_chars_to_font_map(
+                font, set(chr(x) for x in ascii_range), True
+            )
+            return
+
+        os.makedirs(self.stage_glyph_dir, exist_ok=True)
+        output_dir = os.path.join(self.output_dir, 'glyph')
+        os.makedirs(output_dir)
         with ProcessPoolExecutor() as executor:
             futures = []
-            for c in range(ord(' '), ord('~') + 1):
+            for c in ascii_range:
                 name = f'idx{c:03d}_{c:02x}'
                 txt_file = os.path.join(self.stage_glyph_dir, name + '.txt')
                 with open(txt_file, 'w', encoding='ascii') as f:
@@ -887,12 +1133,31 @@ class Converter:
             for future in futures:
                 future.result()
 
+    def build_lvgl_fonts(self):
+        """Builds LVGL style binary fonts."""
+        # Font size determines memory usage and text resolution in depthcharge,
+        # so dpi and font size values should correlate. We divide dpi by 3
+        # to get a reasonable font size in pixels.
+        os.makedirs(self.output_lvgl_fonts_dir, exist_ok=True)
+        font_size = round(self.config[KEY_DPI] / 3)
+        run_lv_font_conv(
+            self.locale_fonts,
+            self.shared_fonts,
+            self.filename_to_font,
+            font_size,
+            self.config[KEY_BPP],
+            self.output_lvgl_fonts_dir,
+        )
+
     def copy_images_to_rw(self):
         """Copies localized images specified in boards.yaml for RW override."""
         split_ratio = self.config[KEY_SPLIT_RATIO]
         if not self.config[KEY_RW_OVERRIDE] and split_ratio == 0:
             print('  No localized images are specified for RW, skipping')
             return
+
+        if self.lvgl_font:
+            raise BuildImageError('RW assets are not supported for LVGL')
 
         # Check if the split ratio between RO and RW is supported.
         if split_ratio not in (0, 100):
@@ -932,7 +1197,11 @@ class Converter:
             os.path.join(self.output_dir, 'locales'), 'w', encoding='utf-8'
         ) as f:
             for locale_info in self.locales:
-                f.write(f'{locale_info.code},{locale_info.rtl:d}\n')
+                f.write(
+                    f'{locale_info.code},'
+                    f'{locale_info.rtl:d},'
+                    f'{locale_info.font}\n'
+                )
 
     def build(self):
         """Builds all images required by a board."""
@@ -961,6 +1230,10 @@ class Converter:
         print('Building glyphs...')
         self.build_glyphs()
 
+        if self.lvgl_font:
+            print('Building lvgl fonts...')
+            self.build_lvgl_fonts()
+
         print('Copying specified images to RW packing directory...')
         self.copy_images_to_rw()
 
@@ -969,6 +1242,15 @@ def main():
     """Builds bitmaps for firmware screens."""
     parser = argparse.ArgumentParser()
     parser.add_argument('board', help='Target board')
+    parser.add_argument(
+        '-l',
+        '--lvgl_font',
+        action='store_true',
+        help=(
+            'Generate LVGL style .c font and text files'
+            'instead of bitmaps for localized strings.'
+        ),
+    )
     args = parser.parse_args()
     board = args.board
 
@@ -977,9 +1259,11 @@ def main():
     board_config = load_board_config(BOARDS_CONFIG_FILE, board)
 
     print('Building for ' + board)
-    check_fonts(formats[KEY_FONTS])
+    check_all_fonts(formats)
     print('Output dir: ' + OUTPUT_DIR)
-    converter = Converter(board, formats, board_config, OUTPUT_DIR)
+    converter = Converter(
+        board, args.lvgl_font, formats, board_config, OUTPUT_DIR
+    )
     converter.build()
 
 

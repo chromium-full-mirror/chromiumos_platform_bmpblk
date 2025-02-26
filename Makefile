@@ -14,7 +14,7 @@ build:
 	LOCALES="$(LOCALES)" \
 		OUTPUT="$(OUTPUT)" \
 		PHYSICAL_PRESENCE="$(PHYSICAL_PRESENCE)" \
-		./build.py "$(BOARD)"
+		./build.py "$(BOARD)" $(ARGS)
 
 archive:
 	./archive.py -a "$(ARCHIVER)" -d "$(OUTPUT)"

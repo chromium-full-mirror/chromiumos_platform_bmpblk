@@ -296,6 +296,11 @@ fonts:
   zh-CN:  'Noto Sans CJK SC'
   zh-TW:  'Noto Sans CJK TC'
 
+# Font for each character not included in locale font
+char_fonts:
+  '⟳': 'Noto Sans Math'
+  '⏻': 'Noto Sans Symbols 2'
+
 # List of names of localized bitmaps to be stored in RW sections only.
 rw_only:
   - dev_title

@@ -32,6 +32,8 @@
 #   adding a new board, please try the maximum DPI first, based on the screen
 #   resolution. If chromeos-bootimage fails to build because of bitmap size
 #   issue, binary-search for the best-fitting DPI value.
+# bpp: Bits per pixel of lvgl-style fonts. A higher bpp results in a higher
+#   resolution.
 # locales: List of locales to include
 # rtl: List of right-to-left locales
 # rw_override: List of names of localized bitmaps to be stored in both RW
@@ -54,6 +56,7 @@
 _DEFAULT_:
   sdcard:      True
   dpi: 192
+  bpp: 4
   # The complete locales we have to support can be found by
   #  ../../platform2/regions/regions.py --format=json | \
   #    jq -rS '[.[].locales[]]|unique[]'
