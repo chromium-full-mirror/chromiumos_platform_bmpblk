@@ -23,6 +23,7 @@ import subprocess
 import sys
 
 
+GENERIC_DIR = 'generic'
 LOCALE_DIR = 'locale'
 LOCALE_RO_DIR = os.path.join(LOCALE_DIR, 'ro')
 LOCALE_RW_DIR = os.path.join(LOCALE_DIR, 'rw')
@@ -43,17 +44,17 @@ def archive_images(archiver, output, name, files):
     subprocess.check_call(command, shell=True)
 
 
-def archive_base(archiver, output):
-    """Archives base (locale-independent) images.
+def archive_generic(archiver, output):
+    """Archives generic (locale-independent) images.
 
     Args:
         archiver: path to the archive tool
         output: path to the output directory
     """
-    base_images = glob.glob(os.path.join(output, '*.bmp'))
+    generic_images = glob.glob(os.path.join(output, '*'))
 
-    # create archive of base images
-    archive_images(archiver, output, 'vbgfx.bin', base_images)
+    # create archive of generic images
+    archive_images(archiver, output, 'vbgfx.bin', generic_images)
 
 
 def archive_localized(archiver, output, pattern):
@@ -67,7 +68,7 @@ def archive_localized(archiver, output, pattern):
     locale_images = defaultdict(lambda: [])
 
     for path in glob.glob(os.path.join(output, '*')):
-        files = glob.glob(os.path.join(path, '*.bmp'))
+        files = glob.glob(os.path.join(path, '*'))
         locale = os.path.basename(path)
         for file in files:
             locale_images[locale].append(file)
@@ -94,7 +95,8 @@ def main(args):
         assert False, 'Invalid usage'
 
     print('Archiving vbfgx.bin', file=sys.stderr, flush=True)
-    archive_base(archiver, output)
+    generic_dir = os.path.join(output, GENERIC_DIR)
+    archive_generic(archiver, generic_dir)
     print('Archiving locales for RO', file=sys.stderr, flush=True)
     ro_locale_dir = os.path.join(output, LOCALE_RO_DIR)
     rw_locale_dir = os.path.join(output, LOCALE_RW_DIR)

@@ -248,6 +248,7 @@ class Converter:
         self.output_dir = os.path.join(output, self.board)
         self.output_ro_dir = os.path.join(self.output_dir, 'locale', 'ro')
         self.output_rw_dir = os.path.join(self.output_dir, 'locale', 'rw')
+        self.output_generic_dir = os.path.join(self.output_dir, 'generic')
         self.stage_dir = os.path.join(output, '.stage')
         self.stage_grit_dir = os.path.join(self.stage_dir, 'grit')
         self.stage_locale_dir = os.path.join(self.stage_dir, 'locale')
@@ -654,6 +655,7 @@ class Converter:
                 )
         # Convert images
         os.makedirs(self.stage_sprite_dir, exist_ok=True)
+        os.makedirs(self.output_generic_dir, exist_ok=True)
         for name, category in names.items():
             new_name = self.rename_map.get(name, name)
             if not new_name:
@@ -661,7 +663,7 @@ class Converter:
             style = get_config_with_defaults(styles, category)
             svg_file = os.path.join(self.sprite_dir, name + '.svg')
             png_file = os.path.join(self.stage_sprite_dir, name + '.png')
-            bmp_file = os.path.join(self.output_dir, new_name + '.bmp')
+            bmp_file = os.path.join(self.output_generic_dir, new_name + '.bmp')
             height = style[KEY_HEIGHT]
             bgcolor = style[KEY_BGCOLOR]
             self.convert_svg_to_png(
@@ -682,12 +684,13 @@ class Converter:
         fonts = self.formats[KEY_FONTS]
         default_font = fonts[KEY_DEFAULT]
 
+        os.makedirs(self.output_generic_dir, exist_ok=True)
         for txt_file in glob.glob(os.path.join(self.strings_dir, '*.txt')):
             name, _ = os.path.splitext(os.path.basename(txt_file))
             new_name = self.rename_map.get(name, name)
             if not new_name:
                 continue
-            bmp_file = os.path.join(self.output_dir, new_name + '.bmp')
+            bmp_file = os.path.join(self.output_generic_dir, new_name + '.bmp')
             category = names[name]
             style = get_config_with_defaults(styles, category)
             if style[KEY_MAX_WIDTH]:
@@ -837,11 +840,14 @@ class Converter:
         The directory self.output_dir contains locale-independent images, and is
         used for creating vbgfx.bin by archive_images.py.
         """
+        os.makedirs(self.output_generic_dir, exist_ok=True)
         for locale_info in self.locales:
             locale = locale_info.code
             ro_locale_dir = os.path.join(self.output_ro_dir, locale)
             old_file = os.path.join(ro_locale_dir, 'language.bmp')
-            new_file = os.path.join(self.output_dir, f'language_{locale}.bmp')
+            new_file = os.path.join(
+                self.output_generic_dir, f'language_{locale}.bmp'
+            )
             if os.path.exists(new_file):
                 raise BuildImageError(f'File already exists: {new_file}')
             shutil.move(old_file, new_file)
