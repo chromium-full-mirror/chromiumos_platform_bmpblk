@@ -17,8 +17,7 @@ build:
 		./build.py "$(BOARD)"
 
 archive:
-	./archive_images.py -a "$(ARCHIVER)" -d "$(OUTPUT)"
-	"$(ARCHIVER)" "$(OUTPUT)/font.bin" create "$(OUTPUT)"/glyph/*.bmp
+	./archive.py -a "$(ARCHIVER)" -d "$(OUTPUT)"
 
 clean:
 	rm -rf $(OUTPUT)

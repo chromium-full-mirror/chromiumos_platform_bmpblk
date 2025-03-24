@@ -24,6 +24,7 @@ import sys
 
 
 GENERIC_DIR = 'generic'
+GLYPH_DIR = 'glyph'
 LOCALE_DIR = 'locale'
 LOCALE_RO_DIR = os.path.join(LOCALE_DIR, 'ro')
 LOCALE_RW_DIR = os.path.join(LOCALE_DIR, 'rw')
@@ -55,6 +56,22 @@ def archive_generic(archiver, output):
 
     # create archive of generic images
     archive_images(archiver, output, 'vbgfx.bin', generic_images)
+
+
+def archive_glyph(archiver, output):
+    """Archives locale-independent glyph images (font data).
+
+    Args:
+        archiver: path to the archive tool
+        output: path to the output directory
+    """
+    glyphs = glob.glob(os.path.join(output, GLYPH_DIR, '*'))
+    if not glyphs:
+        print('  No glyph files, skipping', file=sys.stderr, flush=True)
+        return
+
+    # create archive of glyph images
+    archive_images(archiver, output, 'font.bin', glyphs)
 
 
 def archive_localized(archiver, output, pattern):
@@ -96,6 +113,8 @@ def main(args):
 
     print('Archiving vbfgx.bin', file=sys.stderr, flush=True)
     archive_generic(archiver, output)
+    print('Archiving font.bin', file=sys.stderr, flush=True)
+    archive_glyph(archiver, output)
     print('Archiving locales for RO', file=sys.stderr, flush=True)
     ro_locale_dir = os.path.join(output, LOCALE_RO_DIR)
     rw_locale_dir = os.path.join(output, LOCALE_RW_DIR)
