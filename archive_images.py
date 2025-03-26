@@ -51,7 +51,7 @@ def archive_generic(archiver, output):
         archiver: path to the archive tool
         output: path to the output directory
     """
-    generic_images = glob.glob(os.path.join(output, '*'))
+    generic_images = glob.glob(os.path.join(output, GENERIC_DIR, '*'))
 
     # create archive of generic images
     archive_images(archiver, output, 'vbgfx.bin', generic_images)
@@ -95,8 +95,7 @@ def main(args):
         assert False, 'Invalid usage'
 
     print('Archiving vbfgx.bin', file=sys.stderr, flush=True)
-    generic_dir = os.path.join(output, GENERIC_DIR)
-    archive_generic(archiver, generic_dir)
+    archive_generic(archiver, output)
     print('Archiving locales for RO', file=sys.stderr, flush=True)
     ro_locale_dir = os.path.join(output, LOCALE_RO_DIR)
     rw_locale_dir = os.path.join(output, LOCALE_RW_DIR)
