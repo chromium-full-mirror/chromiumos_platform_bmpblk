@@ -1,4 +1,9 @@
-# bmpblk: Bitmap sources for firmware UI
+# bmpblk: Bitmap sources for firmware UI [DEPRECATED]
+
+> **DEPRECATED**: This repository has been merged into
+> [`chromiumos/platform/depthcharge/bmpblk`](https://chromium.googlesource.com/chromiumos/platform/depthcharge/+/HEAD/bmpblk/)
+> ([b/301567658](http://b/301567658)). Please make all future changes in
+> `src/platform/depthcharge/bmpblk`.
 
 **Note**: Because the bitmaps are stored in RO firmware, back-porting any
 new bitmaps to already shipped devices is not possible.
